@@ -4,9 +4,9 @@
 SoftwareSerial loraSerial(2, 3); 
 
 // === CONFIGURATION SETTINGS ===
-const String NODE_ADDRESS = "1";     // Set to "1" for Arduino A, "2" for Arduino B
+const String NODE_ADDRESS = "2";     // Set to "1" for Arduino A, "2" for Arduino B
 const String NETWORK_ID   = "15";    // Must match the Pi 5 network ID
-const String FREQUENCY    = "915000000"; // 915MHz (Use "868000000" if in Europe)
+const String FREQUENCY    = "865000000"; // 915MHz 
 // ==============================
 
 void setup() {
