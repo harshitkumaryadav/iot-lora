@@ -4,7 +4,7 @@ SoftwareSerial loraSerial(2, 3); // RX, TX (Ensure you are using a 3.3V logic sh
 
 void setup() {
   Serial.begin(9600);        // Hardware Serial to your PC
-  loraSerial.begin(115200);   // RYLR998 default speed
+  loraSerial.begin(9600);   // RYLR998 default speed
   Serial.println("Arduino Loop Listener Ready...");
 }
 
