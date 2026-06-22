@@ -1,4 +1,4 @@
-#include <SoftwareSerial.h>
+ #include <SoftwareSerial.h>
 
 // RX -> D2 (RYLR TX), TX -> D3 (RYLR RX)
 SoftwareSerial rylrSerial(2, 3); 
