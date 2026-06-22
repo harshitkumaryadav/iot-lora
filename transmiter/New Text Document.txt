@@ -1,0 +1,91 @@
+#include <SoftwareSerial.class>
+
+// Arduino RX (Pin 2) -> RYLR998 TXD
+// Arduino TX (Pin 3) -> RYLR998 RXD (Use voltage divider!)
+SoftwareSerial loraSerial(2, 3); 
+
+void setup() {
+  Serial.begin(9600);
+  loraSerial.begin(115200); // RYLR998 default baud rate
+  delay(1000);
+
+  Serial.println("Initializing RYLR998...");
+  
+  // Test connection
+  loraSerial.println("AT");
+  delay(500);
+  showResponse();
+
+  // Set Arduino Address to 2
+  loraSerial.println("AT+ADDRESS=2");
+  delay(500);
+  showResponse();
+
+  // Set Network ID to 18 (Must match the Pi)
+  loraSerial.println("AT+NETWORKID=18");
+  delay(500);
+  showResponse();
+  
+  Serial.println("Setup complete. Sending data...");
+}
+
+void loop() {
+  // Syntax: AT+SEND=<Address>,<Payload Length>,<Message>
+  // Sending to Address 1 (Pi), 4 characters ("PING")
+  Serial.println("Sending PING to Pi...");
+  loraSerial.println("AT+SEND=1,4,PING"); 
+  
+  delay(500);
+  showResponse();
+  
+  delay(2500); // Wait before sending next packet
+}
+
+void showResponse() {
+  while (loraSerial.available()) {
+    String response = loraSerial.readStringUntil('\n');
+    Serial.println("LoRa Module: " + response);
+  }
+}
+
+
+
+
+import time
+import serial
+
+# Configure the serial port (Use /dev/ttyAMA0 on older Pis or Pi 5)
+ser = serial.Serial(
+    port="/dev/ttyS0",
+    baudrate=115200,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE,
+    bytesize=serial.EIGHTBITS,
+    timeout=1,
+)
+
+
+def send_cmd(cmd):
+    """Helper function to send AT commands"""
+    ser.write((cmd + "\r\n").encode("utf-8"))
+    time.sleep(0.5)
+    while ser.in_waiting:
+        print("Response:", ser.readline().decode("utf-8").strip())
+
+
+print("Initializing RYLR998...")
+send_cmd("AT")  # Test responsiveness (Should return +OK)
+send_cmd("AT+ADDRESS=1")  # Set Pi address to 1
+send_cmd("AT+NETWORKID=18")  # Both modules must have the same Network ID
+
+print("\nListening for messages...")
+try:
+    while True:
+        if ser.in_waiting:
+            packet = ser.readline().decode("utf-8").strip()
+            print(f"Received: {packet}")
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    print("\nStopping listener.")
+finally:
+    ser.close()
